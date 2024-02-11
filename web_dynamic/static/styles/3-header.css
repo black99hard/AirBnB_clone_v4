@@ -1,23 +1,28 @@
 header {
-    background: white;
-    height: 70px;
     width: 100%;
+    background-color: white;
+    height: 70px;
     border-bottom: 1px solid #CCCCCC;
-}
-header .logo {
-    background: url("../images/logo.png") no-repeat;
-    left: 20px;
-    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-header #api_status {
-    margin-left: auto;
-    width: 40px;
-    height: 40px;
+header > .logo {
+    width: 142px;
+    height: 60px;
+    background: url("../images/logo.png") no-repeat center;
+    margin-left: 20px;
+}
+
+#api_status {
     margin-right: 30px;
     border-radius: 50%;
-    background-color: #cccccc;
+    width: 40px;
+    height: 40px;
+    background-color: #CCCCCC;
 }
-header #api_status.available {
-	background-color: #ff545f;
+
+#api_status.available {
+    background-color: #FF545F;
 }
