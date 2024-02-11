@@ -46,7 +46,7 @@ $(document).ready(function () {
       $('div.locations > h4').html('&nbsp;');
     }
   });
-  $.get('http://0.0.0.0:5002/api/v1/status/', function (data, textStatus) {
+  $.get('http://0.0.0.0:5001/api/v1/status/', function (data, textStatus) {
     if (textStatus === 'success') {
       if (data.status === 'OK') {
         $('#api_status').addClass('available');
@@ -57,7 +57,7 @@ $(document).ready(function () {
   });
   $.ajax({
     type: 'POST',
-    url: 'http://0.0.0.0:5002/api/v1/places_search',
+    url: 'http://0.0.0.0:5001/api/v1/places_search',
     data: '{}',
     dataType: 'json',
     contentType: 'application/json',
@@ -72,7 +72,7 @@ $(document).ready(function () {
     $('.places > article').remove();
     $.ajax({
       type: 'POST',
-      url: 'http://0.0.0.0:5002/api/v1/places_search',
+      url: 'http://0.0.0.0:5001/api/v1/places_search',
       data: JSON.stringify({'amenities': Object.keys(checkedAmenities), 'states': Object.keys(checkedStates), 'cities': Object.keys(checkedCities)}),
       dataType: 'json',
       contentType: 'application/json',
