@@ -1,83 +1,113 @@
-document.ready(function () {
-	const HOST = "http://127.0.0.1:5001";
-	const amenities = {};
-	const cities = {};
-	const states = {};
+window.addEventListener('load', function () {
+  // task 3
+  $.ajax('http://0.0.0.0:5001/api/v1/status').done(function (data) {
+    if (data.status === 'OK') {
+      $('#api_status').addClass('available');
+    } else {
+      $('#api_status').removeClass('available');
+    }
+  });
 
-	$('ul li input[type="checkbox"]').bind("change", (e) => {
-		const el = e.target;
-		let tt;
-		switch (el.id) {
-			case "state_filter":
-				tt = states;
-				break;
-			case "city_filter":
-				tt = cities;
-				break;
-			case "amenity_filter":
-				tt = amenities;
-				break;
-		}
-		if (el.checked) {
-			tt[el.dataset.name] = el.dataset.id;
-		} else {
-			delete tt[el.dataset.name];
-		}
-		if (el.id === "amenity_filter") {
-			$(".amenities h4").text(Object.keys(amenities).sort().join(", "));
-		} else {
-			$(".locations h4").text(
-				Object.keys(Object.assign({}, states, cities)).sort().join(", ")
-			);
-		}
-	});
+  // task 2
+  const amenityIds = {};
+  $('.amenities input[type=checkbox]').click(function () {
+    if ($(this).prop('checked')) {
+      amenityIds[$(this).attr('data-id')] = $(this).attr('data-name');
+    } else if (!$(this).prop('checked')) {
+      delete amenityIds[$(this).attr('data-id')];
+    }
+    if (Object.keys(amenityIds).length === 0) {
+      $('div.amenities h4').html('&nbsp;');
+    } else {
+      $('div.amenities h4').text(Object.values(amenityIds).join(', '));
+    }
+  });
 
-	// get status of API
-	$.getJSON("http://0.0.0.0:5001/api/v1/status/", (data) => {
-		if (data.status === "OK") {
-			$("div#api_status").addClass("available");
-		} else {
-			$("div#api_status").removeClass("available");
-		}
-	});
+  const stateIds = {};
+  const cityIds = {};
+  // task 4
+  $('.filters button').click(function () {
+    $.ajax({
+      type: 'POST',
+      url: 'http://0.0.0.0:5001/api/v1/places_search/',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        amenities: Object.keys(amenityIds),
+        states: Object.keys(stateIds),
+        cities: Object.keys(cityIds)
+      })
+    }).done(function (data) {
+      $('section.places').empty();
+      $('section.places').append('<h1>Places</h1>');
+      for (const place of data) {
+        const template = `<article>
+        <div class="title">
+        <h2>${place.name}</h2>
+        <div class="price_by_night">
+      $${place.price_by_night}
+      </div>
+        </div>
+        <div class="information">
+        <div class="max_guest">
+        <i class="fa fa-users fa-3x" aria-hidden="true"></i>
 
-	// fetch data about places
-	$.post({
-		url: `${HOST}/api/v1/places_search`,
-		data: JSON.stringify({}),
-		headers: {
-			"Content-Type": "application/json",
-		},
-		success: (data) => {
-			data.forEach((place) =>
-				$("section.places").append(
-					`<article>
-			<div class="title_box">
-			<h2>${place.name}</h2>
-			<div class="price_by_night">$${place.price_by_night}</div>
-			</div>
-			<div class="information">
-			<div class="max_guest">${place.max_guest} Guest${
-						place.max_guest !== 1 ? "s" : ""
-					}</div>
-			<div class="number_rooms">${place.number_rooms} Bedroom${
-						place.number_rooms !== 1 ? "s" : ""
-					}</div>
-			<div class="number_bathrooms">${place.number_bathrooms} Bathroom${
-						place.number_bathrooms !== 1 ? "s" : ""
-					}</div>
-			</div> 
-			<div class="description">
-			${place.description}
-			</div>
-				</article>`
-				)
-			);
-		},
-		dataType: "json",
-	});
+        <br />
 
-	// search places
-	$(".filters button").bind("click", searchPlace);
-	searchPlace();
+      ${place.max_guest} Guests
+
+      </div>
+        <div class="number_rooms">
+        <i class="fa fa-bed fa-3x" aria-hidden="true"></i>
+
+        <br />
+
+      ${place.number_rooms} Bedrooms
+      </div>
+        <div class="number_bathrooms">
+        <i class="fa fa-bath fa-3x" aria-hidden="true"></i>
+
+        <br />
+
+      ${place.number_bathrooms} Bathroom
+
+      </div>
+        </div>
+        <div class="description">
+
+      ${place.description}
+
+      </div>
+
+      </article> <!-- End 1 PLACE Article -->`;
+        $('section.places').append(template);
+      }
+    });
+  });
+
+  // task 6
+  $('.stateCheckBox').click(function () {
+    if ($(this).prop('checked')) {
+      stateIds[$(this).attr('data-id')] = $(this).attr('data-name');
+    } else if (!$(this).prop('checked')) {
+      delete stateIds[$(this).attr('data-id')];
+    }
+    if (Object.keys(stateIds).length === 0 && Object.keys(cityIds).length === 0) {
+      $('.locations h4').html('&nbsp;');
+    } else {
+      $('.locations h4').text(Object.values(stateIds).concat(Object.values(cityIds)).join(', '));
+    }
+  });
+
+  $('.cityCheckBox').click(function () {
+    if ($(this).prop('checked')) {
+      cityIds[$(this).attr('data-id')] = $(this).attr('data-name');
+    } else if (!$(this).prop('checked')) {
+      delete cityIds[$(this).attr('data-id')];
+    }
+    if (Object.keys(stateIds).length === 0 && Object.keys(cityIds).length === 0) {
+      $('.locations h4').html('&nbsp;');
+    } else {
+      $('.locations h4').text(Object.values(cityIds).concat(Object.values(stateIds)).join(', '));
+    }
+  });
 });
