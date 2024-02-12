@@ -1,25 +1,20 @@
-$(document).ready(function () {
-  let checkedAmenities = {};
-  $(document).on('change', "input[type='checkbox']", function () {
-    if (this.checked) {
-      checkedAmenities[$(this).data('id')] = $(this).data('name');
-    } else {
-      delete checkedAmenities[$(this).data('id')];
-    }
-    let lst = Object.values(checkedAmenities);
-    if (lst.length > 0) {
-      $('div.amenities > h4').text(Object.values(checkedAmenities).join(', '));
-    } else {
-      $('div.amenities > h4').html('&nbsp;');
-    }
-  });
-  $.get('http://54.144.249.122:5001/api/v1/status/', function (data, textStatus) {
-    if (textStatus === 'success') {
-      if (data.status === 'OK') {
-        $('#api_status').addClass('available');
-      } else {
-        $('#api_status').removeClass('available');
-      }
-    }
-  });
+document.ready(function () {
+	const amenities = {};
+	$("li input[type=checkbox]").change(function () {
+		if (this.checked) {
+			amenities[this.dataset.name] = this.dataset.id;
+		} else {
+			delete amenities[this.dataset.name];
+		}
+		$(".amenities h4").text(Object.keys(amenities).sort().join(", "));
+	});
+
+	// get status of API
+	$.getJSON("http://54.144.249.122:5001/api/v1/status/", (data) => {
+		if (data.status === "OK") {
+			$("div#api_status").addClass("available");
+		} else {
+			$("div#api_status").removeClass("available");
+		}
+	});
 });
